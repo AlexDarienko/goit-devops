@@ -1,0 +1,18 @@
+# Секрети та конфігурації
+.env
+
+# Файли Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Віртуальне оточення
+venv/
+env/
+
+# Локальна база даних
+db.sqlite3
+
+# Дані PostgreSQL
+postgres_data/
