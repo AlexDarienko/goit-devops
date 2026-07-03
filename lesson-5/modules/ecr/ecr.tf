@@ -7,3 +7,42 @@ resource "aws_ecr_repository" "this" {
   }
   tags = { Name = var.ecr_name }
 }
+
+resource "aws_ecr_repository_policy" "this" {
+  repository = aws_ecr_repository.this.name
+  policy     = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowPull",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = aws_ecr_repository.this.name
+  policy     = jsonencode({
+    rules = [
+      {
+        rulePriority = 1,
+        description  = "Keep last 10 images",
+        selection    = {
+          tagStatus   = "any",
+          countType   = "imageCountMoreThan",
+          countNumber = 10
+        },
+        action       = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}
