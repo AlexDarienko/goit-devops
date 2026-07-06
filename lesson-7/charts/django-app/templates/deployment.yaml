@@ -22,11 +22,31 @@ spec:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
-          # Підключення ConfigMap
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
-          # Requests/Limits обов'язкові для роботи HPA (Autoscaler)
+          
+          # Перевірка на те, чи живий застосунок (Liveness)
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          # Перевірка на те, чи готовий застосунок приймати трафік (Readiness)
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+
           resources:
             requests:
               cpu: 100m
