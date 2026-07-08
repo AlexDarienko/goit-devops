@@ -4,12 +4,12 @@ terraform {
     aws  = { source = "hashicorp/aws", version = "~> 5.0" }
     helm = { source = "hashicorp/helm", version = "~> 2.11" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.23" }
+    tls = { source = "hashicorp/tls", version = "~> 4.0" }
   }
 }
 
 provider "aws" { region = "us-west-2" }
 
-# Налаштування провайдерів Helm та Kubernetes для доступу до EKS
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
@@ -36,5 +36,13 @@ module "s3_backend" { source = "./modules/s3-backend"; bucket_name = var.bucket_
 module "vpc" { source = "./modules/vpc"; vpc_cidr_block = var.vpc_cidr_block; public_subnets = var.public_subnets; private_subnets = var.private_subnets; availability_zones = var.availability_zones; vpc_name = var.vpc_name }
 module "ecr" { source = "./modules/ecr"; ecr_name = var.ecr_name; scan_on_push = true }
 module "eks" { source = "./modules/eks"; cluster_name = var.cluster_name; vpc_id = module.vpc.vpc_id; subnet_ids = module.vpc.private_subnet_ids }
-module "jenkins" { source = "./modules/jenkins"; depends_on = [module.eks] }
+
+module "jenkins" { 
+  source = "./modules/jenkins"
+  cluster_name      = module.eks.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
+  depends_on        = [module.eks] 
+}
+
 module "argo_cd" { source = "./modules/argo_cd"; depends_on = [module.eks] }

@@ -1,7 +1,5 @@
 
-resource "kubernetes_namespace" "argocd" {
-  metadata { name = "argocd" }
-}
+resource "kubernetes_namespace" "argocd" { metadata { name = "argocd" } }
 
 resource "helm_release" "argocd" {
   name       = "argocd"
@@ -12,7 +10,6 @@ resource "helm_release" "argocd" {
   values     = [file("${path.module}/values.yaml")]
 }
 
-# Розгортання ArgoCD Application (App of Apps)
 resource "helm_release" "argocd_apps" {
   name       = "argocd-apps"
   chart      = "${path.module}/charts"

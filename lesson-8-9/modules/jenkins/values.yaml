@@ -1,10 +1,19 @@
 controller:
-  adminPassword: "admin"
+  # adminPassword прибрано
   installPlugins:
     - kubernetes:4.2.1
     - workflow-aggregator:590.v6a_d052e5a_a_b_5
     - git:5.2.1
     - configuration-as-code:1775.v810dc950b_514
+    - credentials:1311.vcf0a_900b_37c2
+    - credentials-binding:642.v1751d650117b_
+  JCasC:
+    defaultConfig: true
 persistence:
   enabled: true
   size: "8Gi"
+serviceAccount:
+  create: true
+  name: jenkins-sa
+  annotations:
+    eks.amazonaws.com/role-arn: "${kaniko_role_arn}"
