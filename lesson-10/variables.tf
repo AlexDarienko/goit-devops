@@ -1,0 +1,9 @@
+variable "bucket_name" { default = "alex-devops-tfstate-l10" }
+variable "dynamo_table_name" { default = "terraform-locks-l10" }
+variable "vpc_cidr_block" { default = "10.0.0.0/16" }
+variable "public_subnets" { default = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"] }
+variable "private_subnets" { default = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"] }
+variable "availability_zones" { default = ["us-west-2a", "us-west-2b", "us-west-2c"] }
+variable "vpc_name" { default = "lesson-10-vpc" }
+variable "ecr_name" { default = "lesson-10-ecr" }
+variable "cluster_name" { default = "lesson-10-eks" }
