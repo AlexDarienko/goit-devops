@@ -3,7 +3,6 @@ resource "aws_db_parameter_group" "rds" {
   count  = var.use_aurora ? 0 : 1
   name   = "${var.identifier}-rds-pg"
   family = var.parameter_group_family
-
   parameter { name = "max_connections"; value = "100"; apply_method = "pending-reboot" }
   parameter { name = "log_statement"; value = "all" }
   parameter { name = "work_mem"; value = "4096" }
@@ -15,7 +14,7 @@ resource "aws_db_instance" "this" {
   engine                 = var.engine
   engine_version         = var.engine_version
   instance_class         = var.instance_class
-  allocated_storage      = 20
+  allocated_storage      = var.allocated_storage # ПУНКТ 5: Винесено в змінну
   db_name                = var.db_name
   username               = var.username
   password               = var.password

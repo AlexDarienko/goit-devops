@@ -37,7 +37,8 @@ module "rds" {
   identifier             = "lesson-10-db"
   db_name                = "django_db"
   username               = "admin"
-  password               = "SuperSecretPassword123!"
+  password               = var.db_password # ПУНКТ 2: Використання змінної замість хардкоду
+  allocated_storage      = var.db_allocated_storage # ПУНКТ 5: Динамічний розмір диска
   vpc_id                 = module.vpc.vpc_id
   vpc_cidr_block         = var.vpc_cidr_block
   subnet_ids             = module.vpc.private_subnet_ids
