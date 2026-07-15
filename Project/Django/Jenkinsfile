@@ -1,0 +1,51 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins-sa
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command: ["sleep", "9999999"]
+  - name: git
+    image: alpine/git
+    command: ["sleep", "9999999"]
+'''
+        }
+    }
+    environment {
+        ECR_REPO = "123456789012.dkr.ecr.us-west-2.amazonaws.com/final-ecr"
+        GIT_URL  = "github.com/alex-dev/devops-final.git"
+    }
+    stages {
+        stage('Build & Push (Kaniko)') {
+            steps {
+                container('kaniko') {
+                    // Context points to the Django folder
+                    sh '/kaniko/executor --context `pwd`/Django --dockerfile `pwd`/Django/Dockerfile --destination ${ECR_REPO}:${BUILD_NUMBER}'
+                }
+            }
+        }
+        stage('Update Git (Helm Chart)') {
+            steps {
+                container('git') {
+                    withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh '''
+                            git clone https://${GIT_USER}:${GIT_PASS}@${GIT_URL} repo
+                            cd repo/charts/django-app
+                            sed -i "s/tag: .*/tag: \\"${BUILD_NUMBER}\\"/" values.yaml
+                            git config user.name "Jenkins CI"
+                            git config user.email "jenkins@ci.local"
+                            git add values.yaml
+                            git commit -m "Update image tag to ${BUILD_NUMBER}"
+                            git push origin main
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}

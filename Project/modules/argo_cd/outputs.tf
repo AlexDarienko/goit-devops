@@ -1,0 +1,3 @@
+output "argocd_url" {
+  value = "Run 'kubectl get svc -n argocd argocd-server'"
+}

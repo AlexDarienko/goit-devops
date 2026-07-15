@@ -1,0 +1,16 @@
+controller:
+  installPlugins:
+    - kubernetes:4.2.1
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:5.2.1
+    - credentials-binding:642.v1751d650117b_
+  JCasC:
+    defaultConfig: true
+persistence:
+  enabled: true
+  size: "8Gi"
+serviceAccount:
+  create: true
+  name: jenkins-sa
+  annotations:
+    eks.amazonaws.com/role-arn: "${kaniko_role_arn}"
