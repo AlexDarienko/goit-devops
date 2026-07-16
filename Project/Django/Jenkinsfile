@@ -17,14 +17,13 @@ spec:
         }
     }
     environment {
-        ECR_REPO = "123456789012.dkr.ecr.us-west-2.amazonaws.com/final-ecr"
         GIT_URL  = "github.com/alex-dev/devops-final.git"
+        // ECR_REPO is automatically injected by Jenkins JCasC
     }
     stages {
         stage('Build & Push (Kaniko)') {
             steps {
                 container('kaniko') {
-                    // Context points to the Django folder
                     sh '/kaniko/executor --context `pwd`/Django --dockerfile `pwd`/Django/Dockerfile --destination ${ECR_REPO}:${BUILD_NUMBER}'
                 }
             }

@@ -3,9 +3,18 @@ controller:
     - kubernetes:4.2.1
     - workflow-aggregator:590.v6a_d052e5a_a_b_5
     - git:5.2.1
+    - configuration-as-code:1775.v810dc950b_514
     - credentials-binding:642.v1751d650117b_
   JCasC:
     defaultConfig: true
+    configScripts:
+      global-env: |
+        unclassified:
+          globalNodeProperties:
+            envVars:
+              env:
+                - key: "ECR_REPO"
+                  value: "${ecr_url}"
 persistence:
   enabled: true
   size: "8Gi"

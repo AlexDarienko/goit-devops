@@ -2,20 +2,19 @@ image:
   repository: 123456789012.dkr.ecr.us-west-2.amazonaws.com/final-ecr
   tag: "latest"
   pullPolicy: Always
+
 service:
   type: LoadBalancer
   port: 80
   targetPort: 8000
+
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 70
+
 env:
   DJANGO_SETTINGS_MODULE: "my_project.settings"
   DEBUG: "False"
   ALLOWED_HOSTS: "*"
-  POSTGRES_DB: "django_db"
-  POSTGRES_USER: "admin"
-  POSTGRES_PASSWORD: "SuperSecretPassword123!"
-  POSTGRES_HOST: "REPLACE_ME_WITH_RDS_ENDPOINT"

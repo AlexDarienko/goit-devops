@@ -1,13 +1,13 @@
 variable "bucket_name" {
-  description = "S3 bucket name for state"
+  description = "S3 bucket name for Terraform state"
   type        = string
-  default     = "alex-devops-tfstate-final"
+  default     = "alex-devops-tfstate-final-v2"
 }
 
 variable "dynamo_table_name" {
   description = "DynamoDB table for state locking"
   type        = string
-  default     = "terraform-locks-final"
+  default     = "terraform-locks-final-v2"
 }
 
 variable "vpc_cidr_block" {
@@ -53,7 +53,7 @@ variable "cluster_name" {
 }
 
 variable "db_password" {
-  description = "Database admin password (passed via tfvars)"
+  description = "Database admin password (passed securely via tfvars)"
   type        = string
   sensitive   = true
 }

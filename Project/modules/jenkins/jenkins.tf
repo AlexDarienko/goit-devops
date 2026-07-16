@@ -46,5 +46,8 @@ resource "helm_release" "jenkins" {
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   namespace  = kubernetes_namespace.jenkins.metadata[0].name
-  values     = [templatefile("${path.module}/values.yaml", { kaniko_role_arn = aws_iam_role.kaniko.arn })]
+  values     = [templatefile("${path.module}/values.yaml", { 
+    kaniko_role_arn = aws_iam_role.kaniko.arn,
+    ecr_url         = var.ecr_url
+  })]
 }

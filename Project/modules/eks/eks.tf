@@ -1,3 +1,33 @@
+resource "aws_security_group" "cluster" {
+  name        = "${var.cluster_name}-cluster-sg"
+  description = "EKS Cluster security group"
+  vpc_id      = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "nodes" {
+  name        = "${var.cluster_name}-node-sg"
+  description = "Security group for all nodes in the cluster"
+  vpc_id      = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = true
+  }
+}
+
 resource "aws_iam_role" "cluster" {
   name = "${var.cluster_name}-cluster-role"
   assume_role_policy = jsonencode({
@@ -6,9 +36,7 @@ resource "aws_iam_role" "cluster" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
+        Principal = { Service = "eks.amazonaws.com" }
       }
     ]
   })
@@ -25,6 +53,7 @@ resource "aws_eks_cluster" "this" {
 
   vpc_config {
     subnet_ids              = var.subnet_ids
+    security_group_ids      = [aws_security_group.cluster.id]
     endpoint_private_access = true
     endpoint_public_access  = true
   }
@@ -33,7 +62,6 @@ resource "aws_eks_cluster" "this" {
     authentication_mode                         = "API_AND_CONFIG_MAP"
     bootstrap_cluster_creator_admin_permissions = true
   }
-
   depends_on = [aws_iam_role_policy_attachment.cluster_policy]
 }
 
@@ -45,9 +73,7 @@ resource "aws_iam_role" "node" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
+        Principal = { Service = "ec2.amazonaws.com" }
       }
     ]
   })

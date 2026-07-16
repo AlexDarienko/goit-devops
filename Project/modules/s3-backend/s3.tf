@@ -4,14 +4,12 @@ resource "aws_s3_bucket" "this" {
     prevent_destroy = false
   }
 }
-
 resource "aws_s3_bucket_versioning" "this" {
   bucket = aws_s3_bucket.this.id
   versioning_configuration {
     status = "Enabled"
   }
 }
-
 resource "aws_s3_bucket_public_access_block" "this" {
   bucket                  = aws_s3_bucket.this.id
   block_public_acls       = true

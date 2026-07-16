@@ -34,7 +34,6 @@ provider "kubernetes" {
   }
 }
 
-# 1. Base Infrastructure
 module "s3_backend" {
   source      = "./modules/s3-backend"
   bucket_name = var.bucket_name
@@ -63,7 +62,6 @@ module "eks" {
   subnet_ids   = module.vpc.private_subnet_ids
 }
 
-# 2. Database
 module "rds" {
   source                 = "./modules/rds"
   use_aurora             = false
@@ -83,12 +81,28 @@ module "rds" {
   db_port                = 5432
 }
 
-# 3. CI/CD & Monitoring
+# Створення Kubernetes Secret з обліковими даними БД для Argo CD
+resource "kubernetes_secret" "django_db_secret" {
+  metadata {
+    name      = "django-db-secret"
+    namespace = "default"
+  }
+  data = {
+    POSTGRES_DB       = module.rds.db_name
+    POSTGRES_USER     = module.rds.username
+    POSTGRES_PASSWORD = var.db_password
+    POSTGRES_HOST     = split(":", module.rds.db_endpoint)[0]
+    POSTGRES_PORT     = "5432"
+  }
+  depends_on = [module.eks, module.rds]
+}
+
 module "jenkins" {
   source            = "./modules/jenkins"
   cluster_name      = module.eks.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
   oidc_provider_url = module.eks.oidc_provider_url
+  ecr_url           = module.ecr.repository_url
   depends_on        = [module.eks]
 }
 
